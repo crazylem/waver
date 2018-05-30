@@ -12,36 +12,28 @@
     class Waver {
 
         constructor(element, options) {
-
-            let self = this;
+            // let self = this;
 
             //extend by function call
-            self.settings = $.extend(true, {
-
+            this.settings = $.extend(true, {
                 debug: true
-
             }, options);
 
-            self.$element = $(element);
+            this.$element = $(element);
 
             //extend by data options
-            self.data_options = self.$element.data('waver');
-            self.settings = $.extend(true, self.settings, self.data_options);
+            // this.data_options = this.$element.data('waver');
+            this.settings = $.extend(true, this.settings, this.$element.data('waver'));
 
-            self.waver_items_data = [];
+            this.waver_items_data = [];
+            this.$waver_items = this.$element.find('.waver-item');
+            this.position = {x: 0, y: 0, rotation: 0};
 
-            self.$waver_items = self.$element.find('.waver-item');
-
-            self.position = {x: 0, y: 0, rotation: 0};
-
-            self.init();
-
+            this.init();
         }
 
         init() {
             let self = this;
-
-
             self.set_waver_items_position();
 
 
@@ -53,7 +45,7 @@
             function BTweens() {
                 var window_width = window.innerWidth,
                     window_height = window.innerHeight,
-                    count = 40;
+                    count = 2;
 
                 TweenLite.killDelayedCallsTo(BTweens);
                 TweenLite.delayedCall(count * 4, BTweens);
@@ -68,14 +60,15 @@
                         bezier_values.push({
                             x: math_random(window_width - bezier_element_width),
                             y: math_random(window_height - bezier_element_height),
-                            zIndex: Math.round(math_random(1) * 7)
+                            // zIndex: Math.round(math_random(1) * 7)
+                            //TODO:? зачем здесь zIndex?
+                            zIndex: 1
                         });
                     }
 
                     if (bezier_element[i].TweenLite) {
                         bezier_element[i].TweenLite.kill()
                     }
-
 
                     TweenMax.to(self.position, count, {
                         bezier: {values: bezier_values, timeResolution: 0, type: "soft"},
