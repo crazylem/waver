@@ -25,8 +25,8 @@
             // this.data_options = this.$element.data('waver');
             this.settings = $.extend(true, this.settings, this.$element.data('waver'));
 
-            this.waver_items_data = [];
-            this.$waver_items = this.$element.find('.waver-item');
+            this.items = [];
+            this.$waverItems = this.$element.find('.waver-item');
             this.position = {x: 0, y: 0, rotation: 0};
 
             this.init();
@@ -34,8 +34,7 @@
 
         init() {
             let self = this;
-            self.set_waver_items_position();
-
+            self.fillItems();
 
             var math_random = function (X) {
                     return Math.random() * X
@@ -104,8 +103,8 @@
             let self = this;
 
 
-            // console.log(self.waver_items_data);
-            self.waver_items_data.forEach(function(waver_item){
+            // console.log(self.items);
+            self.items.forEach(function(waver_item){
 
                 let a = waver_item.x - self.position.x;
                 let b = waver_item.y - self.position.y;
@@ -131,21 +130,17 @@
 
         }
 
-
-        set_waver_items_position() {
-            let self = this;
-
-            self.$waver_items.each(function () {
-
-                self.waver_items_data.push(
+        fillItems() {
+            // let self = this;
+            this.$waverItems.each(function () {
+                this.items.push(
                     {
                         $el: $(this),
                         x: $(this).offset().left + $(this).outerWidth() / 2,
                         y: $(this).offset().top + $(this).outerHeight() / 2,
                     }
                 );
-            })
-
+            });
         }
     }
 
