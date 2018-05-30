@@ -111,9 +111,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             // this.data_options = this.$element.data('waver');
             this.settings = $.extend(true, this.settings, this.$element.data('waver'));
 
-            this.waver_items_data = [];
-            this.$waver_items = this.$element.find('.waver-item');
+            this.items = [];
+            this.$waverItems = this.$element.find('.waver-item');
             this.position = { x: 0, y: 0, rotation: 0 };
+
+            this.$comets = document.querySelectorAll('.GSAP');
+
+            this.bezierCount = 5;
 
             this.init();
         }
@@ -122,55 +126,58 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             key: 'init',
             value: function init() {
                 var self = this;
-                self.set_waver_items_position();
+                self.fillItems();
 
-                var math_random = function math_random(X) {
-                    return Math.random() * X;
-                },
-                    bezier_element = document.querySelectorAll('.GSAP');
+                var randomFromTo = function randomFromTo() {
+                    var from = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+                    var to = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+                    return Math.random() * from + to - from;
+                };
+                // bezier_element = document.querySelectorAll('.GSAP');
 
                 function BTweens() {
-                    var window_width = window.innerWidth,
-                        window_height = window.innerHeight,
-                        count = 2;
+                    // let windowWidth = window.innerWidth,
+                    //     windowHeight = window.innerHeight,
+                    // let count = 5;
 
                     TweenLite.killDelayedCallsTo(BTweens);
-                    TweenLite.delayedCall(count * 4, BTweens);
+                    TweenLite.delayedCall(this.bezierCount * 4, BTweens);
 
-                    for (var i = bezier_element.length; i--;) {
-                        var c = count,
-                            bezier_values = [],
-                            bezier_element_width = bezier_element[i].offsetWidth,
-                            bezier_element_height = bezier_element[i].offsetHeight;
+                    for (var i = this.$comets.length; i--;) {
+                        var count = this.bezierCount,
+                            bezierValues = [];
+                        // bezier_element_width = bezier_element[i].offsetWidth,
+                        // bezier_element_height = bezier_element[i].offsetHeight;
 
-                        while (c--) {
-                            bezier_values.push({
-                                x: math_random(window_width - bezier_element_width),
-                                y: math_random(window_height - bezier_element_height),
+                        while (count--) {
+                            bezierValues.push({
+                                x: randomFromTo(0, window.innerWidth - this.$comets[i].offsetWidth),
+                                y: randomFromTo(0, window.innerHeight - this.$comets[i].offsetHeight),
                                 // zIndex: Math.round(math_random(1) * 7)
-                                //TODO:? зачем здесь zIndex?
+                                //TODO:? зачем здесь рандом zIndex?
                                 zIndex: 1
                             });
                         }
 
-                        if (bezier_element[i].TweenLite) {
-                            bezier_element[i].TweenLite.kill();
+                        if (this.$comets[i].TweenLite) {
+                            this.$comets[i].TweenLite.kill();
                         }
 
                         TweenMax.to(self.position, count, {
-                            bezier: { values: bezier_values, timeResolution: 0, type: "soft" },
+                            bezier: { values: bezierValues, timeResolution: 0, type: "soft" },
                             yoyo: true,
                             repeat: -1,
                             onUpdate: function onUpdate() {
-                                self.on_update();
+                                self.onUpdate();
                             }, ease: Linear.easeNone
                         });
 
                         if (self.settings.debug) {
-                            TweenMax.to(bezier_element[i], count, {
+                            TweenMax.to(this.$comets[i], count, {
                                 yoyo: true,
                                 repeat: -1,
-                                bezier: { timeResolution: 0, type: "soft", values: bezier_values },
+                                bezier: { timeResolution: 0, type: "soft", values: bezierValues },
                                 ease: Linear.easeNone
                             });
                         }
@@ -185,12 +192,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 };
             }
         }, {
-            key: 'on_update',
-            value: function on_update() {
+            key: 'onUpdate',
+            value: function onUpdate() {
                 var self = this;
-
-                // console.log(self.waver_items_data);
-                self.waver_items_data.forEach(function (waver_item) {
+                // console.log(self.items);
+                self.items.forEach(function (waver_item) {
 
                     var a = waver_item.x - self.position.x;
                     var b = waver_item.y - self.position.y;
@@ -213,13 +219,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                 });
             }
         }, {
-            key: 'set_waver_items_position',
-            value: function set_waver_items_position() {
+            key: 'fillItems',
+            value: function fillItems() {
                 var self = this;
-
-                self.$waver_items.each(function () {
-
-                    self.waver_items_data.push({
+                this.$waverItems.each(function () {
+                    self.items.push({
                         $el: $(this),
                         x: $(this).offset().left + $(this).outerWidth() / 2,
                         y: $(this).offset().top + $(this).outerHeight() / 2
@@ -239,8 +243,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             i = void 0,
             ret = void 0;
         for (i = 0; i < length; i++) {
-            if ((typeof opt === 'undefined' ? 'undefined' : _typeof(opt)) == 'object' || typeof opt == 'undefined') $this[i].waver = new Waver($this[i], opt);else ret = $this[i].waver[opt].apply($this[i].waver, args);
-            if (typeof ret != 'undefined') return ret;
+            if ((typeof opt === 'undefined' ? 'undefined' : _typeof(opt)) === 'object' || typeof opt === 'undefined') $this[i].waver = new Waver($this[i], opt);else ret = $this[i].waver[opt].apply($this[i].waver, args);
+            if (typeof ret !== 'undefined') return ret;
         }
         return $this;
     };

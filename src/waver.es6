@@ -29,6 +29,10 @@
             this.$waverItems = this.$element.find('.waver-item');
             this.position = {x: 0, y: 0, rotation: 0};
 
+            this.$comets = document.querySelectorAll('.GSAP');
+
+            this.bezierCount = 5;
+
             this.init();
         }
 
@@ -36,54 +40,54 @@
             let self = this;
             self.fillItems();
 
-            var math_random = function (X) {
-                    return Math.random() * X
-                },
-                bezier_element = document.querySelectorAll('.GSAP');
+            let randomFromTo = function (from = 0, to = 1) {
+                    return Math.random() * from + to - from;
+                };
+                // bezier_element = document.querySelectorAll('.GSAP');
 
             function BTweens() {
-                var window_width = window.innerWidth,
-                    window_height = window.innerHeight,
-                    count = 2;
+                // let windowWidth = window.innerWidth,
+                //     windowHeight = window.innerHeight,
+                // let count = 5;
 
                 TweenLite.killDelayedCallsTo(BTweens);
-                TweenLite.delayedCall(count * 4, BTweens);
+                TweenLite.delayedCall(this.bezierCount * 4, BTweens);
 
-                for (var i = bezier_element.length; i--;) {
-                    var c = count,
-                        bezier_values = [],
-                        bezier_element_width = bezier_element[i].offsetWidth,
-                        bezier_element_height = bezier_element[i].offsetHeight;
+                for (let i = this.$comets.length; i--;) {
+                    let count = this.bezierCount,
+                        bezierValues = [];
+                        // bezier_element_width = bezier_element[i].offsetWidth,
+                        // bezier_element_height = bezier_element[i].offsetHeight;
 
-                    while (c--) {
-                        bezier_values.push({
-                            x: math_random(window_width - bezier_element_width),
-                            y: math_random(window_height - bezier_element_height),
+                    while (count--) {
+                        bezierValues.push({
+                            x: randomFromTo(0, window.innerWidth - this.$comets[i].offsetWidth),
+                            y: randomFromTo(0, window.innerHeight - this.$comets[i].offsetHeight),
                             // zIndex: Math.round(math_random(1) * 7)
-                            //TODO:? зачем здесь zIndex?
+                            //TODO:? зачем здесь рандом zIndex?
                             zIndex: 1
                         });
                     }
 
-                    if (bezier_element[i].TweenLite) {
-                        bezier_element[i].TweenLite.kill()
+                    if (this.$comets[i].TweenLite) {
+                        this.$comets[i].TweenLite.kill()
                     }
 
                     TweenMax.to(self.position, count, {
-                        bezier: {values: bezier_values, timeResolution: 0, type: "soft"},
+                        bezier: {values: bezierValues, timeResolution: 0, type: "soft"},
                         yoyo: true,
                         repeat: -1,
                         onUpdate: function () {
-                            self.on_update();
+                            self.onUpdate();
                         }, ease: Linear.easeNone
                     });
 
 
                     if (self.settings.debug) {
-                        TweenMax.to(bezier_element[i], count, {
+                        TweenMax.to(this.$comets[i], count, {
                             yoyo: true,
                             repeat: -1,
-                            bezier: {timeResolution: 0, type: "soft", values: bezier_values},
+                            bezier: {timeResolution: 0, type: "soft", values: bezierValues},
                             ease: Linear.easeNone
                         });
                     }
@@ -99,10 +103,8 @@
 
         }
 
-        on_update(){
+        onUpdate() {
             let self = this;
-
-
             // console.log(self.items);
             self.items.forEach(function(waver_item){
 
@@ -131,19 +133,16 @@
         }
 
         fillItems() {
-            // let self = this;
+            let self = this;
             this.$waverItems.each(function () {
-                this.items.push(
-                    {
-                        $el: $(this),
-                        x: $(this).offset().left + $(this).outerWidth() / 2,
-                        y: $(this).offset().top + $(this).outerHeight() / 2,
-                    }
-                );
+                self.items.push({
+                    $el: $(this),
+                    x: $(this).offset().left + $(this).outerWidth() / 2,
+                    y: $(this).offset().top + $(this).outerHeight() / 2,
+                });
             });
         }
     }
-
 
     $.fn.waver = function () {
         let $this = this,
@@ -153,11 +152,11 @@
             i,
             ret;
         for (i = 0; i < length; i++) {
-            if (typeof opt == 'object' || typeof opt == 'undefined')
+            if (typeof opt === 'object' || typeof opt === 'undefined')
                 $this[i].waver = new Waver($this[i], opt);
             else
                 ret = $this[i].waver[opt].apply($this[i].waver, args);
-            if (typeof ret != 'undefined') return ret;
+            if (typeof ret !== 'undefined') return ret;
         }
         return $this;
     };
